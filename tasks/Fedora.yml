@@ -1,0 +1,11 @@
+---
+- name: Install Fedora docker package repo
+  copy:
+    src: docker.repo
+    dest: /etc/yum.repos.d/docker.repo
+  #when: ansible_distribution_version|int >= docker_fedora_min_releasever
+
+- name: Install Fedora docker package
+  dnf:
+    name: docker-engine
+    state: present
