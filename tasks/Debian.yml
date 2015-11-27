@@ -1,13 +1,41 @@
 ---
 - name: Ensure docker apt key is present
-  apt_key: url=https://get.docker.io/gpg state=present
+  sudo: yes
+  apt_key:
+    keyserver: "hkp://p80.pool.sks-keyservers.net:80"
+    id: "58118E89F3A912897C070ADBF76221572C52609D"
+    state: present
 
-- name: Ensure apt-transport-https installedq
-  apt: name=apt-transport-https state=present
+- name: Ensure apt-transport-https installed
+  sudo: yes
+  apt:
+    name: apt-transport-https
+    state: present
+
+- name: Ensure linux-image-extra installed
+  sudo: yes
+  apt:
+  name: "linux-image-extra-{{ansible_kernel}}"
+    state: present
 
 - name: Ensure docker repository is present
-  apt_repository: repo='deb https://get.docker.io/ubuntu docker main' state=present
+  sudo: yes
+  apt_repository:
+    repo: "deb https://apt.dockerproject.org/repo {{ansible_distribution|lower}}-{{ansible_distribution_release}} main"
+    update_cache: yes
+    state: present
 
-- name: Ensure docker packages are present
-  apt: name=lxc-docker state=present
-  notify: restart docker
+- name: Ensure old docker packages are removed
+  sudo: yes
+  apt:
+    name: lxc-docker
+    state: absent
+    purge: yes
+  notify: Restart docker
+
+- name: Ensure current docker packages are present
+  sudo: yes
+  apt:
+    name: docker-engine
+    state: present
+  notify: Restart docker

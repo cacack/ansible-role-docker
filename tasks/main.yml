@@ -8,14 +8,21 @@
   when: ansible_os_family == "Debian"
   tags: [docker,packages]
 
-- name: Ensure pip is installed
-  easy_install: name=pip
+- include: Fedora.yml
+  when: ansible_os_family == "Fedora"
   tags: [docker,packages]
 
-- name: Ensure docker-py and pip packages are present
-  pip: name=docker-py version=1.1.0 state=present
-  tags: [docker,packages]
+#- name: Ensure pip is installed
+#  easy_install: name=pip
+#  tags: [docker,packages]
+#
+#- name: Ensure docker-py and pip packages are present
+#  pip: name=docker-py version=1.1.0 state=present
+#  tags: [docker,packages]
 
 - name: Ensure docker is started
-  service: name=docker state=started enabled=yes
+  service:
+    name: docker
+    state: started
+    enabled: yes
   tags: [docker,service]
