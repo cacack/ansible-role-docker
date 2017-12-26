@@ -17,3 +17,11 @@
     name: docker
     state: started
     enabled: yes
+
+- name: Add users to docker group
+  user:
+    name: "{{ item }}"
+    append: "yes"
+    groups:
+      - "docker"
+  with_items: "{{ docker_users }}"
