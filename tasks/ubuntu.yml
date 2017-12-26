@@ -33,6 +33,6 @@
 
 - name: Install Docker
   package:
-    name: "docker-ce={{ docker_version }}"
+    name: "docker-ce={{ docker_version }}~ce-0~ubuntu"
     state: present
   notify: Restart docker
