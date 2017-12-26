@@ -1,28 +1,19 @@
 ---
+
 - name: Ensure system is x86_64
   fail: msg="Docker requires a 64bit system architecture"
   when: "ansible_architecture != 'x86_64'"
-  tags: [docker,check]
 
-- include: Debian.yml
-  when: ansible_os_family == "Debian"
-  tags: [docker,packages]
-
-- include: Fedora.yml
-  when: ansible_os_family == "Fedora"
-  tags: [docker,packages]
-
-#- name: Ensure pip is installed
-#  easy_install: name=pip
-#  tags: [docker,packages]
-#
-#- name: Ensure docker-py and pip packages are present
-#  pip: name=docker-py version=1.1.0 state=present
-#  tags: [docker,packages]
-
-- name: Ensure docker is started
+- name: Include OS-specific tasks
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - files:
+      - "{{ ansible_distribution|lower }}-{{ ansible_distribution_major_version }}.yml"
+      - "{{ ansible_distribution|lower }}.yml"
+      - "{{ ansible_os_family|lower }}.yml"
+    
+- name: Enable and start docker daemon
   service:
     name: docker
     state: started
     enabled: yes
-  tags: [docker,service]
