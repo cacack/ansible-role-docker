@@ -1,37 +1,42 @@
 ---
 
-- name: Remove old docker packages
-  apt:
-    name:
-      - docker
-      - docker-engine
-      - docker.io
-    state: absent
+- name: Sudo
+  block:
 
-- name: Install dependencies
-  apt:
-    name:
-      - apt-transport-https
-      - ca-certificates
-      - curl
-      - software-properties-common
-    state: present
+    - name: Remove old docker packages
+      apt:
+        name:
+          - docker
+          - docker-engine
+          - docker.io
+        state: absent
 
-- name: Install Docker's GPG key
-  apt_key:
-    url: 'https://download.docker.com/linux/ubuntu/gpg'
-    id: "{{ docker_gpg_key_id }}"
-    state: present
+    - name: Install dependencies
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+        state: present
 
-- name: Install Docker APT repository
-  apt_repository:
-    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release|lower }} stable"
-    filename: docker
-    update_cache: yes
-    state: present
+    - name: Install Docker's GPG key
+      apt_key:
+        url: 'https://download.docker.com/linux/ubuntu/gpg'
+        id: "{{ docker_gpg_key_id }}"
+        state: present
 
-- name: Install Docker
-  apt:
-    name: "docker-ce={{ docker_version }}*"
-    state: present
-  notify: Restart docker
+    - name: Install Docker APT repository
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release|lower }} stable"
+        filename: docker
+        update_cache: yes
+        state: present
+
+    - name: Install Docker
+      apt:
+        name: "docker-ce={{ docker_version }}*"
+        state: present
+      notify: Restart docker
+
+  become: true
